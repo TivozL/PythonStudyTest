@@ -3,7 +3,9 @@ live_settings = {}
 live_shopping_list = []
 is_working = True
 
-def say_hello(name):                        #начальное приветствие
+def say_hello():                        #начальное приветствие
+    print("What is your name?")
+    name = input()
     print(f"Hello, {name}, what is next?")
 
 def create_shopping_list():                 #создание списка покупок
@@ -13,49 +15,57 @@ def create_shopping_list():                 #создание списка по�
         print(f"Enter price of your {n} purchase: (Enter 0 to stop)")
         try:
             item = float(input())
-            if item != 0:
-                shop_list.append(abs(item))
+            if item > 0:        #если ценник не отрицательный
+                shop_list.append(item)
                 n += 1
+            elif item == 0:
+                if shop_list:           #проверка на непустоту списка
+                    n = 0
+                else: print(f"Empty list! Add something!")
             else:
-                n = 0
+                print("Price should be positive!")
         except ValueError:
             print(f"Wrong enter, try again")
+    print("Done!")
     return shop_list
 
 def create_settings():          #начальные параметры скидок
     settings_dict = {"price_limit": 0, "min_price": 0, "percent": 0}
-    print("Enter maximum purchase price limit:")
-    try:
-        settings_dict["price_limit"] = abs(int(input()))
-        if settings_dict["price_limit"] < 0:
+    flags = [False,False,False]        #флаги корректного заполнения каждого значения
+    while not flags[0]:
+        print("Enter maximum purchase price limit:")
+        try:
+            settings_dict["price_limit"] = int(input())
+            if settings_dict["price_limit"] < 0:
+                print("Wrong input!")
+            else:
+                flags[0] = True     #limit больше нуля, первый флаг выполнен
+        except ValueError:
             print("Wrong input")
-            return {}
-    except ValueError:
-        print("Wrong input")
-        return {}
 
-    print("Enter the minimum price to receive a discount:")
-    try:
-        settings_dict["min_price"] = abs(int(input()))
-        if settings_dict["min_price"] < 0:
+    while not flags[1]:
+        print("Enter the minimum price to receive a discount:")
+        try:
+            settings_dict["min_price"] = int(input())
+            if settings_dict["min_price"] < 0:
+                print("Wrong input, price should be positive!")
+            else:
+                flags[1] = True     #минимальный ценник положительный -> второй флаг выполнен
+        except ValueError:
             print("Wrong input")
-            return {}
-    except ValueError:
-        print("Wrong input")
-        return {}
 
-    print("What percentage is the discount?:")
-    try:
-        settings_dict["percent"] = abs(int(input()))
-        if settings_dict["percent"] < 0:
-            print("Wrong input")
-            return {}
-    except ValueError:
-        print("Wrong input")
-        return {}
+    while not flags[2]:
+        print("What percentage is the discount?:")
+        try:
+            settings_dict["percent"] = int(input())
+            if settings_dict["percent"] < 0 or settings_dict["percent"] > 100:
+                print("Wrong input, percentage should be from 0 to 100")
+            else:
+                flags[2] = True     #корректный процентаж -> выполненный третий флаг
+        except ValueError:
+            print("Wrong input!")
 
     print("Done!")
-    print(settings_dict['percent'])
     return settings_dict
 
 def make_stat(settings_dict,shopping_list):   #финальные подсчёты
@@ -95,10 +105,9 @@ def show_stat(stat_dict, settings_dict):
     print(f"Purchases at a discount: {stat_dict["discount_items"]}")
     print(f"Benefit: {stat_dict["final_benefit"]}")
     print(f"Final price: {stat_dict["final_price"]}")
-    main_menu()
 
-def choise():
-    global live_stat, live_shopping_list, live_settings
+def choice():
+    global live_stat, live_shopping_list, live_settings, is_working
     print("1.Create purchases list")
     print("2.Change settings")
     print("3.Show statistic")
@@ -112,28 +121,20 @@ def choise():
         elif n == 3:
             if live_settings == {} or live_shopping_list == []:
                 print("Nothing to be done!")
-                choise()
             else:
                 live_stat = make_stat(live_settings,live_shopping_list)
                 show_stat(live_stat,live_settings)
 
         elif n == 0:
-            global is_working
             is_working = False
             return
         else:
-            print("Wrong enter")
-            choise()
+            print("Wrong enter!")
 
     except ValueError:
         print("Wrong enter")
-        choise()
-
-def main_menu():
-    print("What is your name?")
-    say_hello(input())
-    while is_working:
-        choise()
 
 
-main_menu()
+say_hello()
+while is_working:
+    choice()
