@@ -104,8 +104,9 @@ def get_len_limit_input():          #проверка на ввод адеква
         except ValueError:      #если введено не число
             print("Enter valid integer instead of this.")
 
-print("=================Text analyzer!=================")
-text = get_text_input()
-target = get_target_input()
-n = get_len_limit_input()
-show_report(text,target,n)
+if __name__ == "__main__":
+    print("=================Text analyzer!=================")
+    text = get_text_input()
+    target = get_target_input()
+    n = get_len_limit_input()
+    show_report(text,target,n)
